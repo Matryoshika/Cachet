@@ -6,7 +6,6 @@ import com.jarhax.prestige.data.GlobalPrestigeData;
 import com.jarhax.prestige.data.PlayerData;
 
 import net.minecraft.advancements.Advancement;
-import net.minecraft.command.CommandHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
@@ -56,11 +55,12 @@ public class Cachet {
 			PlayerData data = GlobalPrestigeData.getPlayerData(player);
 			data.addPrestige(adv);
 			GlobalPrestigeData.save(player);
-
+			
 			player.sendMessage(new TextComponentString(String.format(Properties.config.configuration.notice, adv)));
+			player.sendMessage(new TextComponentString("§cDue to how Prestige handles points, you will lose points from §6[Cachet] §cwhen respeccing!"));
 		}
 		else {
-			setNBT(player, Properties.config.configuration.counter * 1);
+			setNBT(player, Properties.config.configuration.counter);
 		}
 	}
 
