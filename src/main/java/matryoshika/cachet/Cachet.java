@@ -12,7 +12,10 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.server.permission.DefaultPermissionLevel;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 @Mod(modid = Cachet.MODID, name = Cachet.NAME, version = Cachet.VERSION, dependencies = "required-after:bookshelf;required-after:prestige", serverSideOnly = true, acceptableRemoteVersions = "*")
 public class Cachet {
@@ -22,11 +25,18 @@ public class Cachet {
 
 	private static Logger logger;
 	private static String NBT_TAG = "cachet:tick_timer";
+	public static final String CACHET_PERMISSION_SELF = MODID + ".timer.self";
+	public static final String CACHET_PERMISSION_ALL = MODID + ".timer.all";
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
-		
+	}
+	
+	@EventHandler
+	public void init(FMLInitializationEvent event) {
+		PermissionAPI.registerNode(CACHET_PERMISSION_SELF, DefaultPermissionLevel.ALL, "Allows the player to check their own Cachet time");
+		PermissionAPI.registerNode(CACHET_PERMISSION_ALL, DefaultPermissionLevel.OP, "Allows the player to check anyone's Cachet time");
 		new CommandCachet().registerSelf();
 	}
 
