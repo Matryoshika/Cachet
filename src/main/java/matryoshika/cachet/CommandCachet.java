@@ -7,10 +7,17 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.server.permission.PermissionAPI;
 
 public class CommandCachet extends CommandBase {
+	
+	private static final TextComponentString commandErrorServer = new TextComponentString("Error: Cannot check Cachet time for Server");
+	private static final TextComponentString commandErrorPerms = new TextComponentString("Error: sender has no relevant permissions, aborting command");
+	private static final TextComponentString commandErrorPermsOther = new TextComponentString("Error: You do not have the required permissions to check other's time");
+	private static final TextComponentString slash = new TextComponentString("/");
+	private static final TextComponentString timer = new TextComponentString(Properties.config.configuration.timer);
 
 	@Override
 	public String getName() {
@@ -37,7 +44,7 @@ public class CommandCachet extends CommandBase {
 			if (isPlayer && !args[0].toLowerCase().equals(((EntityPlayerMP) sender).getName().toLowerCase()))
 				//if player and doesn't have permission to check other's
 				if (isPlayer && !PermissionAPI.hasPermission((EntityPlayerMP) sender, Cachet.CACHET_PERMISSION_ALL)) {
-					sender.sendMessage(new TextComponentString("§cError: You do not have the required permissions to check other's time"));
+					sender.sendMessage(commandErrorPermsOther);
 					return;
 				}
 
@@ -45,15 +52,14 @@ public class CommandCachet extends CommandBase {
 		}
 		// check if sender is server. If so, make sure they check a player
 		else if (!isPlayer && args.length == 0) {
-			sender.sendMessage(new TextComponentString("§cError: Cannot check Cachet time for Server"));
+			sender.sendMessage(commandErrorServer);
 			return;
 		}
 		// check if player is allowed to check their own time
 		else if (isPlayer && PermissionAPI.hasPermission((EntityPlayerMP) sender, Cachet.CACHET_PERMISSION_SELF))
 			wanted = (EntityPlayerMP) sender;
 		else {
-			sender.sendMessage(
-					new TextComponentString("§cError: sender has no relevant permissions, aborting command"));
+			sender.sendMessage(commandErrorPerms);
 			return;
 		}
 
@@ -62,8 +68,11 @@ public class CommandCachet extends CommandBase {
 		long minutes = (totalseconds % 3600) / 60;
 		long seconds = totalseconds % 60;
 		String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+		
+		TextComponentString pTime = new TextComponentString(time);
+		pTime.getStyle().setColor(TextFormatting.YELLOW);
 
-		sender.sendMessage(new TextComponentString("§e" + time + " §f/ §2" + Properties.config.configuration.timer));
+		sender.sendMessage(Cachet.base.createCopy().appendSibling(pTime).appendSibling(slash).appendSibling(timer));
 	}
 
 	@Override
@@ -78,6 +87,12 @@ public class CommandCachet extends CommandBase {
 
 	public void registerSelf() {
 		((CommandHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(this);
+		
+		commandErrorServer.getStyle().setColor(TextFormatting.RED);
+		commandErrorPerms.getStyle().setColor(TextFormatting.RED);
+		commandErrorPermsOther.getStyle().setColor(TextFormatting.RED);
+		slash.getStyle().setColor(TextFormatting.WHITE);
+		timer.getStyle().setColor(TextFormatting.GREEN);
 	}
 
 }

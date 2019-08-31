@@ -9,6 +9,7 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -27,10 +28,21 @@ public class Cachet {
 	private static String NBT_TAG = "cachet:tick_timer";
 	public static final String CACHET_PERMISSION_SELF = MODID + ".timer.self";
 	public static final String CACHET_PERMISSION_ALL = MODID + ".timer.all";
+	
+	
+	protected static final TextComponentString base = new TextComponentString("");
+	private static final TextComponentString one = new TextComponentString("Due to how Prestige handles points, you will lose points from ");
+	private static final TextComponentString two = new TextComponentString("[Cachet] ");
+	private static final TextComponentString three = new TextComponentString("when respeccing!");
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
+		
+		
+		one.getStyle().setColor(TextFormatting.RED);
+		two.getStyle().setColor(TextFormatting.GOLD);
+		three.getStyle().setColor(TextFormatting.RED);
 	}
 	
 	@EventHandler
@@ -67,7 +79,8 @@ public class Cachet {
 			GlobalPrestigeData.save(player);
 			
 			player.sendMessage(new TextComponentString(String.format(Properties.config.configuration.notice, adv)));
-			player.sendMessage(new TextComponentString("§cDue to how Prestige handles points, you will lose points from §6[Cachet] §cwhen respeccing!"));
+			
+			player.sendMessage(base.createCopy().appendSibling(one).appendSibling(two).appendSibling(three));
 		}
 		else {
 			setNBT(player, Properties.config.configuration.counter);
